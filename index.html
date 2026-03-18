@@ -198,7 +198,11 @@ body {
 /* ── Text ── */
 #warning-text { font-family:'Fredoka One',cursive; font-size:0.85rem; color:#e74c3c; min-height:1.2rem; text-align:center; }
 #mood-text    { font-family:'Fredoka One',cursive; font-size:1.3rem; text-align:center; min-height:1.8rem; transition:color 0.3s; }
-#hint {
+#game-title {
+    font-family: 'Fredoka One', cursive; font-size: 1.6rem;
+    color: var(--orange-dark); text-align: center; letter-spacing: 1px;
+    text-shadow: 0 3px 0 #e0c9b0;
+}
     display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
     background: white; border-radius: 14px; padding: 7px 12px;
     box-shadow: 0 3px 0 #e0c9b0, 0 0 0 2px var(--potato-dark);
@@ -255,6 +259,8 @@ button:disabled { opacity:0.42; cursor:not-allowed; transform:none !important; }
 </div>
 
 <div id="game">
+
+    <div id="game-title">🥔 SCREAMING POTATO 🥔</div>
 
     <div id="stats-bar">
         <div class="stat-box"><div class="stat-label">Stage</div><span id="val-age" class="stat-val">Baby</span></div>
