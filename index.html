@@ -2,6 +2,7 @@
 <html>
 <head>
 <title>Screaming Potato</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap');
 
@@ -256,7 +257,7 @@ button:disabled { opacity:0.42; cursor:not-allowed; transform:none !important; }
         <!-- Sponge lives here, dragged onto potato to clean -->
         <div id="sponge" style="right:4px;bottom:28px;"></div>
 
-        <div id="potato-wrap" style="width:150px;height:150px;" onclick="pet(event)">
+        <div id="potato-wrap" style="width:150px;height:150px;" onclick="pet(event)" ontouchend="petTouch(event)">
         <svg id="potato-svg" viewBox="0 0 220 260">
 
             <!-- ══ HALO ══ -->
@@ -554,44 +555,68 @@ function showSponge(v) {
     sponge.style.visibility = (v && !state.isDead && !state.hasWon) ? 'visible' : 'hidden';
 }
 
-sponge.addEventListener('mousedown', e => {
+// ── Shared drag logic (mouse + touch) ────────────────────────────────────────
+function getPoint(e) {
+    // returns {clientX, clientY} from either mouse or first touch
+    return e.touches ? e.touches[0] : e;
+}
+
+function startDrag(e) {
     if (state.isDead || state.hasWon) return;
     e.preventDefault();
     dragging = true;
+    const pt   = getPoint(e);
     const rect = sponge.getBoundingClientRect();
-    dragOffX = e.clientX - rect.left;
-    dragOffY = e.clientY - rect.top;
-    // switch to absolute left/top positioning for free movement
+    dragOffX = pt.clientX - rect.left;
+    dragOffY = pt.clientY - rect.top;
     const stageRect = document.getElementById('stage').getBoundingClientRect();
     sponge.style.right  = '';
     sponge.style.bottom = '';
     sponge.style.left   = (rect.left - stageRect.left) + 'px';
     sponge.style.top    = (rect.top  - stageRect.top)  + 'px';
     sponge.classList.add('dragging');
-});
+}
 
-document.addEventListener('mousemove', e => {
+function moveDrag(e) {
     if (!dragging) return;
+    e.preventDefault();
+    const pt = getPoint(e);
     const stageRect = document.getElementById('stage').getBoundingClientRect();
-    sponge.style.left = (e.clientX - stageRect.left - dragOffX) + 'px';
-    sponge.style.top  = (e.clientY - stageRect.top  - dragOffY) + 'px';
+    sponge.style.left = (pt.clientX - stageRect.left - dragOffX) + 'px';
+    sponge.style.top  = (pt.clientY - stageRect.top  - dragOffY) + 'px';
 
-    // check overlap with potato
     const sRect = sponge.getBoundingClientRect();
     const pRect = potatoWrap.getBoundingClientRect();
     const overlap = !(sRect.right < pRect.left || sRect.left > pRect.right ||
                       sRect.bottom < pRect.top  || sRect.top  > pRect.bottom);
     sponge.classList.toggle('on-potato', overlap);
     if (overlap) state.scrubbing = true;
-});
+}
 
-document.addEventListener('mouseup', () => {
+function endDrag() {
     if (!dragging) return;
     dragging = false;
     spongeHome();
-});
+}
+
+sponge.addEventListener('mousedown',  startDrag);
+sponge.addEventListener('touchstart', startDrag, { passive: false });
+
+document.addEventListener('mousemove', moveDrag);
+document.addEventListener('touchmove', moveDrag, { passive: false });
+
+document.addEventListener('mouseup',   endDrag);
+document.addEventListener('touchend',  endDrag);
+document.addEventListener('touchcancel', endDrag);
 
 // ── Pet ──────────────────────────────────────────────────────────────────────
+function petTouch(e) {
+    // prevent the click event from also firing on touch devices
+    e.preventDefault();
+    const t = e.changedTouches[0];
+    pet({ clientX: t.clientX, clientY: t.clientY });
+}
+
 function pet(e) {
     if (state.isDead || state.hasWon || state.petCooldown > 0) return;
     state.attn += 18;
