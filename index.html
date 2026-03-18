@@ -198,7 +198,17 @@ body {
 /* ── Text ── */
 #warning-text { font-family:'Fredoka One',cursive; font-size:0.85rem; color:#e74c3c; min-height:1.2rem; text-align:center; }
 #mood-text    { font-family:'Fredoka One',cursive; font-size:1.3rem; text-align:center; min-height:1.8rem; transition:color 0.3s; }
-#hint         { font-size:0.68rem; opacity:0.5; letter-spacing:0.5px; text-align:center; }
+#hint {
+    display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+    background: white; border-radius: 14px; padding: 7px 12px;
+    box-shadow: 0 3px 0 #e0c9b0, 0 0 0 2px var(--potato-dark);
+    width: 100%;
+}
+#hint span {
+    font-size: 0.75rem; color: var(--text); opacity: 0.8;
+    background: #fdf2e9; border-radius: 20px; padding: 3px 10px;
+    white-space: nowrap;
+}
 
 /* ── Controls ── */
 #controls { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
@@ -459,7 +469,11 @@ button:disabled { opacity:0.42; cursor:not-allowed; transform:none !important; }
 
     <div id="warning-text"></div>
     <div id="mood-text">HELLO, FRIEND!</div>
-    <div id="hint">CLICK to pet · Sponge to wash · FEED to eat</div>
+    <div id="hint">
+        <span>🥔 <b>CLICK</b> to pet</span>
+        <span>🧽 <b>DRAG</b> to wash</span>
+        <span>🍟 <b>BUTTONS</b> to feed</span>
+    </div>
 
     <div id="controls">
         <button id="btn-fries"  onclick="doFeed(event,'fries')">🍟 FRIES</button>
@@ -872,8 +886,7 @@ function render() {
         btn.disabled  = sec > 0;
     });
 
-    document.getElementById('hint').innerText =
-        'CLICK to pet · DRAG 🧽 to wash · FEED to eat';
+
 
     // Warnings — hunger/hygiene take priority when not in panic/rage danger
     if (state.panicTicks > 30) {
